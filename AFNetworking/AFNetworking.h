@@ -41,4 +41,6 @@
     #import "AFHTTPSessionManager.h"
 #endif
 
+#import "UIKit+AFNetworking.h"
+
 #endif /* _AFNETWORKING_ */
