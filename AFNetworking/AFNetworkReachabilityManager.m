@@ -108,7 +108,10 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 @property (readwrite, nonatomic, copy) AFNetworkReachabilityStatusBlock networkReachabilityStatusBlock;
 @end
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
 @implementation AFNetworkReachabilityManager
+#pragma clang diagnostic pop
 
 + (instancetype)sharedManager {
     static AFNetworkReachabilityManager *_sharedManager = nil;
@@ -126,21 +129,29 @@ static void AFNetworkReachabilityReleaseCallback(const void *info) {
 }
 
 + (instancetype)managerForDomain:(NSString *)domain {
+#ifndef __clang_analyzer__
     SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [domain UTF8String]);
 
     AFNetworkReachabilityManager *manager = [[self alloc] initWithReachability:reachability];
     manager.networkReachabilityAssociation = AFNetworkReachabilityForName;
 
     return manager;
+#else 
+	return nil;
+#endif
 }
 
 + (instancetype)managerForAddress:(const void *)address {
+#ifndef __clang_analyzer__
     SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr *)address);
 
     AFNetworkReachabilityManager *manager = [[self alloc] initWithReachability:reachability];
     manager.networkReachabilityAssociation = AFNetworkReachabilityForAddress;
 
     return manager;
+#else
+	return nil;	
+#endif
 }
 
 - (instancetype)initWithReachability:(SCNetworkReachabilityRef)reachability {
